@@ -24,7 +24,6 @@ mongoose
     console.log(err);
   });
 
-const allchunks = [];
 app.post("/api/upload", async (req, res) => {
   const { name, currentChunkIndex, totalChunks } = req.query;
   console.log(`chunk ${currentChunkIndex} uploaded`);
@@ -33,16 +32,21 @@ app.post("/api/upload", async (req, res) => {
   const ext = name.split(".").pop();
   const data = req.body.toString().split(",")[1];
   const buffer = Buffer.from(data, "base64");
-  // const tmpFilename = "tmp_" + md5(name + req.ip) + "." + ext;
   const tmpFilename = name;
+  await File.create({
+    name,
+    index: currentChunkIndex,
+    extension: ext,
+    totalChunks,
+    chunk: data,
+  });
+
   if (firstChunk && fs.existsSync("./uploads/" + tmpFilename)) {
     fs.unlinkSync("./uploads/" + tmpFilename);
   }
   fs.appendFileSync("./uploads/" + tmpFilename, buffer);
   if (lastChunk) {
-    const finalFilename = md5(Date.now()).substr(0, 6) + "." + ext;
-    fs.renameSync("./uploads/" + tmpFilename, "./uploads/" + finalFilename);
-    res.json({ finalFilename });
+    res.json({ message: "Uploaded" });
   } else {
     res.json("ok");
   }

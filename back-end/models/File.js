@@ -8,6 +8,14 @@ const FileSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  extension: {
+    type: String,
+    required: true,
+  },
+  totalChunks: {
+    type: Number,
+    required: true,
+  },
   chunk: {
     type: String,
     required: true,
